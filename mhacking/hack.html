@@ -17,27 +17,28 @@
 	var lastBeep = 0;
 	var gameTable = [[],[],[],[],[],[],[],[],[]];
 	var lastReseed = [[],[],[],[],[],[],[],[],[]];
-	
+
 	function resetGameState() {
 		solutions = ['', ''];
 		solutionPos = [[0,0],[0,0]];
 		userSolPos = [[0,1],[0,15]];
 		solved = [false, false];
 		gameStarted = false;
+		mistakes = 0;
 		$('.sol2').removeClass('sol2');
 	}
-	
+
 	function getRandomInt(min, max) {
 		return Math.floor(Math.random() * (max - min + 1)) + min;
 	}
-	
+
 	function writeSolution() {
 			for(var i = 0; i < solutions[0].length; i++) {
 				$('#'+solutionPos[0][0].toString()+(solutionPos[0][1]+i).toString()).text(solutions[0].charAt(i));
 				$('#'+solutionPos[1][0].toString()+(solutionPos[1][1]+i).toString()).text(solutions[1].charAt(i));
 			}
 	}
-	
+
 	function fadeBigMsg(b) {
 		if (b) {
 			$( '#screen' ).fadeIn();
@@ -45,30 +46,30 @@
 			$( '#screen' ).fadeOut();
 		}
 	}
-	
+
 	function setBigMsg(txt) {
 		$( '#screentext' ).html(txt);
 	}
-	
+
 	function wrongSolution() {
 		mistakes++;
 		endTime = endTime - mistakes * penalty;
 	}
-	
+
 	function tryFinish() {
 		if (solved[0] && solved[1]) {
 			clearInterval(thread);
 			$( '#infobox' ).fadeOut().text('Success').fadeIn();
 			setBigMsg('Success');
 			setTimeout(function(){
-				fadeBigMsg(true); 
+				fadeBigMsg(true);
 				playSound('audiofinish',1);
 				setTimeout(function(){$.post('http://mhacking/callback', JSON.stringify({'success': true}));}, 2000);
 			}, 2000);
 			resetGameState();
 		}
 	}
-	
+
 	function writeUserSolution() {
 		$( '.sol' ).removeClass( 'sol' );
 		for(var i = 0; i < solutions[0].length; i++) {
@@ -78,13 +79,13 @@
 				$('#'+userSolPos[1][0].toString()+(userSolPos[1][1]+i).toString()).addClass( 'sol' );
 			}
 	}
-	
+
 	function writeTime() {
 		if (!solved[0] || !solved[1]) {
 			$( '#infobox' ).text(((endTime - (new Date()).getTime())/1000.0).toFixed(2).toString()+"s");
 		}
 	}
-	
+
 	function seedTable() {
 		for (var j = 0; j < 18; j++) {
 			$( "#0" + (j+1).toString() ).html('&nbsp;');
@@ -95,7 +96,7 @@
 			$( '#infobox' ).fadeOut().text('Failure').fadeIn();
 			setBigMsg('Failure');
 			setTimeout(function(){
-				fadeBigMsg(true); 
+				fadeBigMsg(true);
 				playSound('audiofail',1);
 				$.post('http://mhacking/callback', JSON.stringify({'success': false}));
 			}, 2000);
@@ -105,7 +106,7 @@
 		}
 		for (var i = 0; i < 9; i++) {
 			for (var j = 0; j < 18; j++) {
-				
+
 				if(lastBeep < now - 600) {
 					playSound('audiobeep',0.08);
 					lastBeep = now;
@@ -120,13 +121,13 @@
 		writeSolution();
 		writeUserSolution();
 	}
-	
+
 	function playSound(snd, vol) {
 		document.getElementById(snd).load();
 		document.getElementById(snd).volume = vol;
 		document.getElementById(snd).play();
 	}
-	
+
 	function generateSolutions(s) {
 		solutionPos[0] = [getRandomInt(1,9),getRandomInt(1,18-s)];
 		var goodsolution = false;
@@ -148,7 +149,7 @@
 		}
 		userSolPos = [[0,1],[0,19-s]];
 	}
-	
+
 	function startGame(solutionsize,timeout) {
 		for (var i = 0; i < 9; i++) {
 			for (var j = 0; j < 18; j++) {
@@ -162,7 +163,7 @@
 			seedTable();
 		},5);
 	}
-	
+
 	$(function(){
 		$( '#game' ).append( '<table id="gametable"></table>' );
 		$( '#gametable' ).append( '<tr id="row0"></tr>' );
@@ -175,9 +176,9 @@
 				$( '#row'+(i+1).toString() ).append( '<td id="'+(i+1).toString() + (j+1).toString()+'">&nbsp;</td>' );
 			}
 		}
-		
+
 		document.onkeydown = function(event) {
-		
+
 			if (gameStarted) {
 				event = event || window.event;
 				var charCode = event.keyCode || event.which;
@@ -251,11 +252,11 @@
 				}
 			}
 		}
-		
+
 		window.addEventListener('message', function(event) {
-				
+
 			var item = event.data;
-			
+
 			if ('start' in item) {
 				if('s' in item && 'd' in item) {
 					setBigMsg('<span class="flash">Starting Hack...</span><br /><span class="small">Find the constant code blocks</span>')
@@ -264,7 +265,7 @@
 					setTimeout(function(){fadeBigMsg(false); startGame(item.s,item.d);}, 3000);
 				}
 			}
-			
+
 			if('show' in item) {
 				if (item.show) {
 					$('#phone').fadeIn();
@@ -276,9 +277,9 @@
 					$('#phonewrapper').fadeOut();
 				}
 			}
-			
+
 		});
-		
+
 		//$('#phone').hide();
 		//$('#bgfill').hide();
 		//$('#phonewrapper').hide();
@@ -338,12 +339,12 @@
 	table td {
 		border: 1px solid #d0f0d0;
 	}
-	
+
 	.sol {
 		background-color: #d0f0d0;
 		color: #178f0a;
 	}
-	
+
 	.sol2 {
 		background-color: #d0f0d0;
 		color: #111111;
