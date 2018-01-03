@@ -39,16 +39,8 @@ AddEventHandler('mtracker:removealltargets', function()
 	SendNUIMessage(nuiMsg)
 end)
 
-AddEventHandler('mtracker:isrunning', function(cb)
-  cb(mTrackerRunning)
-end)
-
-function tablelength(t)
-  local n = 0
-  for _ in pairs(t) do
-    n = n + 1
-  end
-  return n
+function isrunning()
+  return mTrackerRunning
 end
 
 function atan2(x, y)

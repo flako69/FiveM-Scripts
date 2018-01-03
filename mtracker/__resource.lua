@@ -16,3 +16,7 @@ files {
   'beep.ogg',
   'tracker.html'
 }
+
+exports {
+  'isrunning'
+}
