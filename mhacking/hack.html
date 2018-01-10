@@ -11,6 +11,7 @@
 	var gameStarted = false;
 	var solved = [false, false];
 	var endTime = 0;
+	var now = 0;
 	var thread;
 	var penalty = 5000;
 	var mistakes = 0;
@@ -64,7 +65,7 @@
 			setTimeout(function(){
 				fadeBigMsg(true);
 				playSound('audiofinish',1);
-				setTimeout(function(){$.post('http://mhacking/callback', JSON.stringify({'success': true}));}, 2000);
+				setTimeout(function(){$.post('http://mhacking/callback', JSON.stringify({'success': true, 'remainingtime': endTime-now}));}, 2000);
 			}, 2000);
 			resetGameState();
 		}
@@ -90,7 +91,7 @@
 		for (var j = 0; j < 18; j++) {
 			$( "#0" + (j+1).toString() ).html('&nbsp;');
 		}
-		var now = (new Date()).getTime();
+		now = (new Date()).getTime();
 		if (now >= endTime) {
 			clearInterval(thread);
 			$( '#infobox' ).fadeOut().text('Failure').fadeIn();
@@ -98,7 +99,7 @@
 			setTimeout(function(){
 				fadeBigMsg(true);
 				playSound('audiofail',1);
-				$.post('http://mhacking/callback', JSON.stringify({'success': false}));
+				$.post('http://mhacking/callback', JSON.stringify({'success': false, 'remainingtime': 0}));
 			}, 2000);
 			resetGameState();
 		} else {
@@ -259,10 +260,20 @@
 
 			if ('start' in item) {
 				if('s' in item && 'd' in item) {
-					setBigMsg('<span class="flash">Starting Hack...</span><br /><span class="small">Find the constant code blocks</span>')
+					setBigMsg('<span class="flash">Starting Hack...</span><br /><span class="small">Find the constant code blocks</span>');
 					playSound('audiostart',1);
 					$('.flash').fadeOut().fadeIn().fadeOut().fadeIn().fadeOut().fadeIn();
 					setTimeout(function(){fadeBigMsg(false); startGame(item.s,item.d);}, 3000);
+				}
+			}
+			
+			if ('displayMsg' in item) {
+				setBigMsg('<span class="flash">'+item.displayMsg+'</span>');
+			}
+			
+			if ('fail' in item) {
+				if (item.fail) {
+					endTime = now;
 				}
 			}
 
@@ -279,10 +290,7 @@
 			}
 
 		});
-
-		//$('#phone').hide();
-		//$('#bgfill').hide();
-		//$('#phonewrapper').hide();
+		
 	});
 </script>
 <style type="text/css">

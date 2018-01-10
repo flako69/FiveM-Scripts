@@ -1,7 +1,6 @@
-mhackingCallback = {};
+mhackingCallback = {}
 showHelp = false
 helpTimer = 0
-
 helpCycle = 4000
 
 Citizen.CreateThread(function()
@@ -14,6 +13,11 @@ Citizen.CreateThread(function()
 				showHelpText("Use the ~y~Arrow Keys~s~ and ~y~ENTER~s~ for the right code block")
 			else
 				helpTimer = GetGameTimer()+helpCycle
+			end
+			if IsEntityDead(PlayerPedId()) then
+				nuiMsg = {}
+				nuiMsg.fail = true
+				SendNUIMessage(nuiMsg)
 			end
 		end
 	end
@@ -50,7 +54,13 @@ AddEventHandler('mhacking:start', function(solutionlength, duration, callback)
 	showHelp = true
 end)
 
+AddEventHandler('mhacking:setmessage', function(msg)
+    nuiMsg = {}
+	nuiMsg.displayMsg = msg
+	SendNUIMessage(nuiMsg)
+end)
+
 RegisterNUICallback('callback', function(data, cb)
-	mhackingCallback(data.success)
+	mhackingCallback(data.success, data.remainingtime)
     cb('ok')
 end)
